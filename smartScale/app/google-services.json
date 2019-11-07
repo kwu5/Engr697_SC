@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "1067236739386",
+    "firebase_url": "https://smartscale697.firebaseio.com",
+    "project_id": "smartscale697",
+    "storage_bucket": "smartscale697.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1067236739386:android:8f40d68b4ea6f81773e803",
+        "android_client_info": {
+          "package_name": "com.example.smartscale"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1067236739386-6vkosujf3all64nvie2f4k4cvgiujl4j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smartscale",
+            "certificate_hash": "c703affb591fa97634bddb03c565df88dfc06a94"
+          }
+        },
+        {
+          "client_id": "1067236739386-td603m485jibggnp02n8tlek4uct3p0v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smartscale",
+            "certificate_hash": "90afbb5de344f808c1bada3482e5d4c8095d09ef"
+          }
+        },
+        {
+          "client_id": "1067236739386-u07p7m44ihqkjk3k7mkifuk10mquo4bo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVJ8gJoWYl11gsYUq56RtrWXOYJT_X3ps"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1067236739386-u07p7m44ihqkjk3k7mkifuk10mquo4bo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

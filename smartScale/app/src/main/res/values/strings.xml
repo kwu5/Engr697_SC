@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">smartScale</string>
+    <string name="measurement">Measurement</string>
+    <string name="trends">Trends</string>
+    <string name="myAccount">MyAccount</string>
+
+
+</resources>
