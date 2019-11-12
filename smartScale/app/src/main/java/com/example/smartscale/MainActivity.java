@@ -34,9 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    long temp;
+    protected FirebaseFirestore db;
 
-    DocumentReference docRef;
 
 
 
@@ -48,22 +47,17 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: MainActivity started");
 
+
         signIn();
 
-        getTemp();
-
-
-
-        //
-        //Intent goMeasurement = new Intent();
-        //goMeasurement.setClass(this,measurements.class);
-        //startActivity(goMeasurement);
 
 
 
 
-        //todo test readWrite fx
-        //basicReadWrite();
+        Intent goMeasurement = new Intent();
+        goMeasurement.setClass(this,measurements.class);
+        startActivity(goMeasurement);
+
 
 
     }
@@ -75,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     public void signIn() {
 
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
 
 
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
@@ -104,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         db.collection("UserData").document("sampleUser").update("BMI",80);
 
-    **/
+
         db.collection("ESP_SS")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -133,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
         db.collection("UserData").document(id1).set(sampleUser2);
 
 
+         **/
 
         //With this change, timestamps stored in Cloud Firestore will be read back as com.google.firebase.
         // Timestamp objects instead of as system java.util.Date objects.
@@ -148,11 +143,6 @@ public class MainActivity extends AppCompatActivity {
         //todo
 
 
-    }
-
-
-    public void getTemp(){
-        Log.d(TAG, "getTempLLLLLLL: Temp = "+ temp);
     }
 
 
