@@ -12,6 +12,7 @@ import android.widget.Button;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,6 +29,7 @@ public class measurements extends AppCompatActivity {
 
 
 
+
     protected FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private double BMI;
@@ -35,6 +37,8 @@ public class measurements extends AppCompatActivity {
     //id for testing
     private final String sampleID = "sampleUser";
     private final float sampleHeight = 110;
+
+    private String userUid;
 
 
     @Override
@@ -95,11 +99,24 @@ public class measurements extends AppCompatActivity {
 
 
     /**
-     * load user info from firebase for local calculation
+     * 1. load user info passed from FirebaseUIActivity for local calculation
+     * 2. if new user, create new document; promopt user to enter his/her information
      */
-    public void setUserInfo(){
+    public void setUserInfo() {
 
-    }
+        userUid = getIntent().getStringExtra("userUID");
+        if (userUid != null) {
+            Log.d(TAG, "setUserInfo: userUid: " + userUid);
+
+        } else {
+            Log.d(TAG, "setUserInfo: get userUid failed");
+        }
+
+
+        
+
+        }
+
 
 
     /**
@@ -122,7 +139,10 @@ public class measurements extends AppCompatActivity {
                     if (documentSs.exists()) {
                         Log.d(TAG, "onComplete: DocumentSnapshot Data: " + documentSs.getData());
                         calculation(documentSs);
-                        uploadData(documentSs, sampleID);
+
+
+
+                        uploadData(documentSs, userUid);
 
 
 
