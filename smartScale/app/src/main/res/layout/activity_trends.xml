@@ -53,11 +53,14 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/MEASUREMENT"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+
+    <com.jjoe64.graphview.GraphView
+        android:id="@+id/graph"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="200dp" />
+
+
 
 
 </RelativeLayout>

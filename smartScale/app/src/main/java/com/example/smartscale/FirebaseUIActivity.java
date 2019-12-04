@@ -40,6 +40,7 @@ public class FirebaseUIActivity extends AppCompatActivity {
 
 
 
+
         }
 
 
@@ -104,9 +105,7 @@ public class FirebaseUIActivity extends AppCompatActivity {
                 goMeasurement.setClass(this, measurements.class);
                 startActivity(goMeasurement);
 
-
-
-
+                finish();
 
             } else {
 

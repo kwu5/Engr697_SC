@@ -53,11 +53,25 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/MEASUREMENT"
+    <Button
+        android:id="@+id/start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="200dp"
+        android:text="@string/startMeasurement" />
+
+    <TextView
+        android:id="@+id/BMI"
+        android:layout_width="149dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="400dp"
+        android:layout_marginLeft="400dp"
+        android:layout_marginTop="400dp"
+        android:layout_marginEnd="400dp"
+        android:layout_marginRight="400dp"
+        android:layout_marginBottom="400dp" />
 
 
 </RelativeLayout>

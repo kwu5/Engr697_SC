@@ -3,6 +3,18 @@
     <string name="measurement">Measurement</string>
     <string name="trends">Trends</string>
     <string name="myAccount">MyAccount</string>
+    <string name="startMeasurement">Start</string>
+
+
+
+    <string name="title">Please Enter the following information</string>
+    <string name="height">Height(m):</string>
+    <string name="age">Age:</string>
+    <string name="enter">Enter</string>
+
+
+
+
 
 
 </resources>

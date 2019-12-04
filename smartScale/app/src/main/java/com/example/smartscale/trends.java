@@ -8,10 +8,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
 public class trends extends AppCompatActivity {
 
     Button button_measurement, button_trends, button_myAccount;
     private static final String TAG = "Trends";
+
+
+
 
 
     @Override
@@ -39,6 +46,16 @@ public class trends extends AppCompatActivity {
                 enter(button_myAccount);
             }
         });
+
+
+        GraphView graph = (GraphView) findViewById(R.id.graph);
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[]{
+                new DataPoint(9.11,1),
+                new DataPoint(9.12,5),
+                new DataPoint(9.13,3)
+
+        });
+        graph.addSeries(series);
     }
 
 
