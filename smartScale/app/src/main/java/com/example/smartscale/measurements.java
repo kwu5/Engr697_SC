@@ -16,20 +16,24 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
 
 public class measurements extends AppCompatActivity {
 
     private Button button_measurement, button_trends, button_myAccount,button_start;
-    private TextView textView_BMI;
+    private TextView textView_BMI,textView_WEIGHT;
 
     private static final String TAG = "Measurement";
 
@@ -37,21 +41,28 @@ public class measurements extends AppCompatActivity {
 
     private static boolean isuserInfoSet = false;
 
-    protected FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
     private boolean nUser = true;
     private static boolean nLogin = true;
 
+    private Map<String, Integer> weightUpdate = new HashMap<>() ;
+    private Map<String, Float> BMIUpdate = new HashMap<>();
 
-    private double BMI = 0;
+    private Map<Object, Object> WEIGHT = new HashMap<>();
+    private Map<Object, Object> BMI= new HashMap<>();
+
 
     //id for testing
     private final String sampleID = "sampleUser";
     private final float sampleHeight = 110;
 
     private static String USERUID;
-    private double WEIGHT;
+
+    private int weight = 0;
+    private float bmi = 0f;
+
     private double HEIGHT;
     private int AGE;
 
@@ -76,7 +87,7 @@ public class measurements extends AppCompatActivity {
         button_start = findViewById(R.id.start);
 
         textView_BMI = findViewById(R.id.BMI);
-
+        textView_WEIGHT = findViewById(R.id.weight);
 
         //set up listener for bottom buttons
         button_myAccount.setOnClickListener(new View.OnClickListener() {
@@ -88,6 +99,7 @@ public class measurements extends AppCompatActivity {
         button_trends.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 enter(button_trends);
             }
         });
@@ -111,7 +123,10 @@ public class measurements extends AppCompatActivity {
             nLogin = false;
         }
 
-        textView_BMI.setText(String.valueOf(BMI));
+        textView_WEIGHT.setText(String.valueOf(weight));
+        textView_BMI.setText(String.valueOf(bmi));
+
+
 
 
     }
@@ -119,7 +134,7 @@ public class measurements extends AppCompatActivity {
 
     public void enter(View v) {
         Intent goNext = new Intent();
-        updateData(goNext);
+        sentData(goNext);
         switch (v.getId()) {
             case (R.id.trends):
                 goNext.setClass(this, trends.class);
@@ -167,7 +182,11 @@ public class measurements extends AppCompatActivity {
                                     Log.d(TAG, "setUserInfo: user info found: "+ documentSnapshot.getData());
                                     Log.d(TAG, "setUserInfo: id is  "+ documentSnapshot.getId());
 
+
                                     isuserInfoSet = true;
+
+
+
 
                                     break;
                                 }
@@ -176,27 +195,6 @@ public class measurements extends AppCompatActivity {
                             //create new user document
                             if(nUser){
                                 goInputUserInfo();
-
-
-
-
-
-
-
-//                                db.collection("UserData").add(data)
-//                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                                            @Override
-//                                            public void onSuccess(DocumentReference documentReference) {
-//                                                Log.d(TAG, "setUserInfo :new user Document created for user : "+ data.get("USERUID"));
-//
-//                                            }
-//                                        })
-//                                        .addOnFailureListener(new OnFailureListener() {
-//                                            @Override
-//                                            public void onFailure(@NonNull Exception e) {
-//                                                Log.w(TAG, "setUserInfo : Error when create new user document:  ",e );
-//                                            }
-//                                        });
                             }
 //
                         }else{
@@ -270,6 +268,7 @@ public class measurements extends AppCompatActivity {
 
         HEIGHT = data.getDoubleExtra("height",0);
         AGE = data.getIntExtra("age",0);
+
         Log.d(TAG, "createNewUserDoc: value return");
         Log.d(TAG, "createNewUserDoc: Height:"+ HEIGHT);
         Log.d(TAG, "createNewUserDoc: Age:"+ AGE);
@@ -277,15 +276,20 @@ public class measurements extends AppCompatActivity {
 
         Map<String, Object> nData = new HashMap<>();
 
-        BMI = 0;
-        WEIGHT = 0;
+//        WEIGHT = new HashMap<>();
+//        BMI= new HashMap<>();
+
+
+
 
         //todo ask user for info
         nData.put("HEIGHT",HEIGHT);
         nData.put("USERUID", USERUID);
-        nData.put("WEIGHT", WEIGHT);
-        nData.put("BMI",BMI);
         nData.put("AGE",AGE);
+        nData.put("WEIGHT",WEIGHT);
+        nData.put("BMI",BMI);
+
+
 
         DocumentReference newUser = db.collection("UserData").document(USERUID);
         newUser.set(nData);
@@ -381,7 +385,8 @@ public class measurements extends AppCompatActivity {
 
         try{
 
-            WEIGHT = documentSs.getDouble("WEIGHT").intValue();
+             weight = documentSs.getDouble("WEIGHT").intValue();
+
 
             final DocumentReference documentRef = db.collection("UserData").document(USERUID);
             documentRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -389,8 +394,8 @@ public class measurements extends AppCompatActivity {
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     double height =  documentSnapshot.getDouble("HEIGHT");
 
-                    BMI = WEIGHT/ (float) Math.pow(height,2);
-                    Log.d(TAG, "calculation: BMI is "+ BMI);
+                    bmi = weight/ (float) Math.pow(height,2);
+                    Log.d(TAG, "calculation: BMI is "+ bmi);
 
                     uploadData(documentSs,USERUID);
                 }
@@ -418,7 +423,14 @@ public class measurements extends AppCompatActivity {
      * 2.send data to other intent
      * @param i
      */
-    public void updateData(Intent i) {
+    public void sentData(Intent i) {
+
+        i.putExtra("USERUID",USERUID);
+
+
+
+
+
         return;
     }
 
@@ -429,14 +441,69 @@ public class measurements extends AppCompatActivity {
     public void uploadData(DocumentSnapshot documentSs, String userId){
 
 
-        double weight = documentSs.getDouble("WEIGHT");
+
         Log.d(TAG, "uploadData: weight: "+ weight);
 
+
+        String time = documentSs.getTimestamp("TIME").toDate().toString().substring(4,10);
+//        Log.d(TAG, "uploadData: Time is :"+ time);
+
+
+
+
+
+
+
+        weightUpdate.put(time,weight);
+        WEIGHT.put("WEIGHT",weightUpdate);
+
+        BMIUpdate.put(time,bmi);
+        BMI.put("BMI",BMIUpdate);
+
+
+
+
+         db.collection("UserData").document(userId).
+                 set(WEIGHT, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
+             @Override
+             public void onComplete(@NonNull Task<Void> task) {
+                     if (task.isSuccessful()) {
+                         Log.d(TAG, "uploadData: weight upload success");
+                     }else{
+                         Log.d(TAG, "uploadData: weight uploadData failed");
+                     }
+
+                 }
+             });
+
+        db.collection("UserData").document(userId).
+                set(BMI, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "uploadData: weight upload success");
+                }else{
+                    Log.d(TAG, "uploadData: weight uploadData failed");
+                }
+
+            }
+        });
+
+
+
+
         Map <String,Object> updates = new HashMap<>();
-        updates.put("WEIGHT",weight);
-        updates.put("BMI",BMI);
+       updates.put("currentWeight",weight);
+        updates.put("currentBMI",bmi);
+//        updates.put("WEIGHT",weightUpdate);
+//        updates.put("BMI",BMIUpdate);
+
+
+
+
 
         DocumentReference doc = db.collection("UserData").document(userId);
+
 
         if(doc == null){
             Log.d(TAG, "uploadData: cannot find targeted document");
@@ -453,9 +520,34 @@ public class measurements extends AppCompatActivity {
             }
         });
 
+//        doc.update("WEIGHT", WEIGHT).addOnCompleteListener(new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//                if (task.isSuccessful()) {
+//                    Log.d(TAG, "uploadData: weight upload success");
+//                }else{
+//                    Log.d(TAG, "uploadData: weight uploadData failed");
+//                }
+//
+//            }
+//        });
+//        doc.update("BMI",BMIUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//                if (task.isSuccessful()) {
+//                    Log.d(TAG, "uploadData: BMI upload success");
+//                }else{
+//                    Log.d(TAG, "uploadData: BMI uploadData failed");
+//                }
+//
+//            }
+//
+//        });
+
+
 
         updates.clear();
-        textView_BMI.setText(String.valueOf((float)BMI));
+        textView_BMI.setText(String.valueOf((float)bmi));
     }
 
 
