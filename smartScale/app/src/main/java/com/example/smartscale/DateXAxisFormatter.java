@@ -27,18 +27,20 @@ public class DateXAxisFormatter extends ValueFormatter  {
 
 
     @Override
-    public java.lang.String getFormattedValue(float value){
+    public java.lang.String getFormattedValue(float value) {
 
 
-
-       String date = String.valueOf((int)value);
+        String date = String.valueOf((int) value);
 
 //        Log.d(TAG, "getFormattedValue: "+ value);
 //        Log.d(TAG, "getFormattedValue: "+ date);
 
-       return months[month-1]+ " " + date ;
 
-        }
+        return months[month] + " " + date;
+
+
+    }
+
 
 
 }

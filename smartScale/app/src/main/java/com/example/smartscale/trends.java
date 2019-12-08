@@ -8,7 +8,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -38,29 +41,44 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class trends extends AppCompatActivity {
+public class trends extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+//    private Context context;
 
     private Button button_measurement, button_trends, button_myAccount,BMI,WEIGHT;
+    private Spinner chooseMonth;
+    private LineChart chart ;
 
     private static final String TAG = "Trends";
+
+    private char showFlag = 'w';
+    /***w: show Weight
+     * b: show BMI
+     */
+
+
 
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String USERUID;
 
-    private int month = 1;//todo
+    private static int themonth  ;  //to get the month selected, +1 to the value
 
     private final String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
+    private List<Entry> entries = new ArrayList<Entry>();
 
-//    private LineGraphSeries<DataPoint> WeightSeries;
-//    private LineGraphSeries<DataPoint> BMISeries;
+
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trends);
+//        context = this;
 
         Log.d(TAG, "onCreate: " + TAG + " starts. ");
 
@@ -74,33 +92,167 @@ public class trends extends AppCompatActivity {
 
         //initialize common widgets
         button_measurement = findViewById(R.id.measurements);
-        button_myAccount = findViewById(R.id.myAccount);
+//        button_myAccount = findViewById(R.id.myAccount);
         button_trends = findViewById(R.id.trends);
         BMI = findViewById(R.id.BMI_switch);
         WEIGHT = findViewById(R.id.WEIGHT_switch);
+        chooseMonth = findViewById(R.id.spinner);
+        chart = findViewById(R.id.chart);
 
 
 
-        //set up listener for bottom buttons
+        //set up listeners
         button_measurement.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 enter(button_measurement);
             }
         });
-        button_myAccount.setOnClickListener(new View.OnClickListener() {
+//        button_myAccount.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                enter(button_myAccount);
+//
+//            }
+//        });
+        BMI.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                enter(button_myAccount);
+                showFlag = 'b';
+                showChart(showFlag);
+
+            }
+        });
+        WEIGHT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showFlag = 'w';
+                showChart(showFlag);
+
+            }
+        });
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.months,android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        chooseMonth.setAdapter(adapter);
+        chooseMonth.setOnItemSelectedListener(this);
+
+
+
+    }
+
+    public void showChart( char showFlag) {
+
+        entries.clear();
+
+
+
+        final DocumentReference docRef = db.collection("UserData").document(USERUID);
+        switch (showFlag) {
+            case 'w':
+                showWeight(docRef,themonth);
+                break;
+            case 'b':
+                showBMI(docRef,themonth);
+                break;
+                default:
+                    Log.d(TAG, "showChart: Not a valid arg ");
+        }
+
+
+}
+
+    public void showBMI(DocumentReference docRef, final int month){
+
+
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+//                    Log.d(TAG, "Current data: " + snapshot.getData());
+
+//
+                    Map<String, Double> BMI_data = (Map) snapshot.get("BMI");
+
+                    //to get a sorted map
+                    TreeMap<String, Double> BMI_data_S = new TreeMap<>();
+                    BMI_data_S.putAll(BMI_data);
+
+
+                    String BMI_K[] = BMI_data_S.keySet().toArray(new String[BMI_data.keySet().size()]);
+
+
+                    try {
+
+
+//                        if (month == 12) {
+//                            Log.d(TAG, "onEvent 13: month =  "+ month);
+//                            for (int i = 0; i < 7; i++) {
+//                                float date = Float.valueOf(WEIGHT_K[i].substring(4, 6));
+//                                entries.add(new Entry(date,WEIGHT_data.get(WEIGHT_K[i])));
+//                            }
+
+//                    } else {
+
+                        Log.d(TAG, "onEvent else: month =  " + month);
+                        for (int i = 0; i < (BMI_K.length); i++) {
+
+
+                            if (months[month].equals(BMI_K[i].substring(0, 3))) {
+
+                                float date = Float.valueOf(BMI_K[i].substring(4, 6));
+                                Log.d(TAG, "setSeries: date: " + date);
+                                entries.add(new Entry(date, BMI_data.get(BMI_K[i]).floatValue()));
+                            }
+
+                        }
+
+
+//                        }
+
+                    } catch (Exception ee) {
+                        Log.d(TAG, "onEvent: BMI ERROR" + ee.getMessage());
+                    }
+
+
+                }
+
+
+                Log.d(TAG, "onEvent: Entry: " + entries);
+
+                LineDataSet dataSet = new LineDataSet(entries, " ");
+
+                Log.d(TAG, "onEvent: Dataset: " + dataSet);
+
+
+                LineData lineData = new LineData(dataSet);
+
+
+                Log.d(TAG, "onEvent: LineData" + lineData);
+
+                chart.setData(lineData);
+
+
+                XAxis xAxis = chart.getXAxis();
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setValueFormatter(new DateXAxisFormatter(month));
+                xAxis.setAxisMinimum(1);
+                xAxis.setAxisMaximum(31);
+
+                chart.invalidate();
             }
         });
 
 
-        final LineChart chart = findViewById(R.id.chart);
+    }
+    
+    public void showWeight(DocumentReference docRef,final int month){
 
-        final List<Entry> entries = new ArrayList<Entry>();
-
-        final DocumentReference docRef = db.collection("UserData").document(USERUID);
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot,
@@ -115,23 +267,34 @@ public class trends extends AppCompatActivity {
 
 //
                     Map<String, Long> WEIGHT_data = (Map) snapshot.get("WEIGHT");
-//                    Map<String, Long> BMI_data = (Map) snapshot.get("BMI");
 
+                    //to get a sorted map
                     TreeMap<String, Long> WEIGHT_data_S = new TreeMap<>();
                     WEIGHT_data_S.putAll(WEIGHT_data);
 
 
                     String WEIGHT_K[] = WEIGHT_data_S.keySet().toArray(new String[WEIGHT_data.keySet().size()]);
-//                   Set<String> WEIGHT_key = WEIGHT_data.keySet();
-//                    String BMI_key[] = ((String[]) BMI_data.keySet().toArray());
+
 
                     try {
-//
-                        for (int i = 0; i < WEIGHT_K.length; i++) {
 
-                            if (months[month - 1].equals(WEIGHT_K[i].substring(0, 3))) {
-                                float date = Float.valueOf(WEIGHT_K[i].substring(4,6));
-//                                double date1 = Double.parseDouble(date);
+
+//                        if (month == 12) {
+//                            Log.d(TAG, "onEvent 13: month =  "+ month);
+//                            for (int i = 0; i < 7; i++) {
+//                                float date = Float.valueOf(WEIGHT_K[i].substring(4, 6));
+//                                entries.add(new Entry(date,WEIGHT_data.get(WEIGHT_K[i])));
+//                            }
+
+//                    } else {
+
+                        Log.d(TAG, "onEvent else: month =  " + month);
+                        for (int i = 0; i < (WEIGHT_K.length); i++) {
+
+
+                            if (months[month].equals(WEIGHT_K[i].substring(0, 3))) {
+
+                                float date = Float.valueOf(WEIGHT_K[i].substring(4, 6));
                                 Log.d(TAG, "setSeries: date: " + date);
                                 entries.add(new Entry(date, WEIGHT_data.get(WEIGHT_K[i])));
                             }
@@ -139,29 +302,10 @@ public class trends extends AppCompatActivity {
                         }
 
 
-                        /**find all months
-                         for (int i = 0; i < WEIGHT_K.length; i++) {
-                         //
-                         int month_int = 1;
-                         for (int j = 0; j < months.length; j++, month_int++) {
-                         //                                Log.d(TAG, "onEvent: "+ WEIGHT_key[i].substring(0, 3));
-                         if (months[j].equals(WEIGHT_K[i].substring(0, 3))) {
-                         break;
-                         }
-                         }
-                         String date = month_int + "." + WEIGHT_K[i].substring(4);
-                         //                            Log.d(TAG, "setSeries: month_int: " + month_int);
-                         //                            Log.d(TAG, "setSeries: date: " + date);
-                         Float datef = Float.valueOf(date);
-                         Log.d(TAG, "setSeries: date: " + datef);
-
-                         entries.add(new Entry(datef, WEIGHT_data.get(WEIGHT_K[i])));
-                         }
-                         **/
-
+//                        }
 
                     } catch (Exception ee) {
-                        Log.d(TAG, "onEvent: ERROR" + ee.getMessage());
+                        Log.d(TAG, "onEvent: WEIGHT ERROR" + ee.getMessage());
                     }
 
 
@@ -170,46 +314,31 @@ public class trends extends AppCompatActivity {
 
                 Log.d(TAG, "onEvent: Entry: " + entries);
 
-                LineDataSet dataSet = new LineDataSet(entries, "Label");
+                LineDataSet dataSet = new LineDataSet(entries, " ");
 
                 Log.d(TAG, "onEvent: Dataset: " + dataSet);
 
 
                 LineData lineData = new LineData(dataSet);
-//                lineData.setValueFormatter(new DateXAxisFormatter());
-//                                           Log.d(TAG, "onEvent: Entry: 1");
 
 
-                Log.d(TAG, "onEvent: LineData"+ lineData);
+                Log.d(TAG, "onEvent: LineData" + lineData);
 
                 chart.setData(lineData);
 
 
                 XAxis xAxis = chart.getXAxis();
                 xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-                xAxis.setDrawGridLines(true);
                 xAxis.setValueFormatter(new DateXAxisFormatter(month));
-
-
-
-//                                           Log.d(TAG, "onEvent: Entry: 2");
+                xAxis.setAxisMinimum(1);
+                xAxis.setAxisMaximum(31);
 
                 chart.invalidate();
             }
         });
 
 
-//        GraphView graph = (GraphView) findViewById(R.id.graph);
-//        CreateGraph(graph, "WEIGHT");
 
-
-//        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[]{
-//                new DataPoint(9.11,1),
-//                new DataPoint(9.12,5),
-//                new DataPoint(9.13,3)
-//
-//        });
-//        graph.addSeries(series);
     }
 
 
@@ -236,13 +365,29 @@ public class trends extends AppCompatActivity {
 
 
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+//        String monthShowed = adapterView.getItemAtPosition(i).toString();
+        themonth = adapterView.getSelectedItemPosition();
 
 
 
 
+        Log.d(TAG, "onItemSelected: The month "+ themonth);
+        showChart(showFlag);
 
 
+    }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        themonth = 12;
+        Log.d(TAG, "onItemSelected: The month "+ themonth);
+        showChart(showFlag);
+
+
+    }
 
 
 //    private void CreateGraph(final GraphView graph, String field){
