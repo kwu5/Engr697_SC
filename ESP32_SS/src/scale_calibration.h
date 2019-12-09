@@ -33,7 +33,7 @@
 #include <Arduino.h>
 #include <HX711.h>
 
-#define DOUT  2
+#define DOUT  15
 #define CLK  4
 
 class HX711 scale;
