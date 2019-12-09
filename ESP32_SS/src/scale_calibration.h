@@ -20,8 +20,8 @@
  and the direction the sensors deflect from zero state
  This example code uses bogde's excellent library:"https://github.com/bogde/HX711"
  bogde's library is released under a GNU GENERAL PUBLIC LICENSE
- Arduino pin 2 -> HX711 CLK
- 3 -> DOUT
+ Arduino pin 4 -> HX711 CLK
+ 2 -> DOUT
  5V -> VCC
  GND -> GND
 
@@ -33,8 +33,8 @@
 #include <Arduino.h>
 #include <HX711.h>
 
-#define DOUT  25
-#define CLK  26
+#define DOUT  2
+#define CLK  4
 
 class HX711 scale;
 
@@ -47,32 +47,41 @@ void setup() {
   scale.set_scale();
   scale.tare(); //Reset the scale to 0
 
-  long zero_factor = scale.read_average(); //Get a baseline reading
+  long zero_factor = scale.read_average(20); //Get a baseline reading
   Serial.print("Zero factor: "); //This can be used to remove the need to tare the scale. Useful in permanent scale projects.
   Serial.println(zero_factor);
   long test_factor = scale.get_units(10);
+  Serial.print("test factor: ");
   Serial.println(test_factor);
-  calibration_factor = test_factor/3;
+  // calibration_factortt = test_factor*3;
+  calibration_factor = -22185;
+
 }
 
 void loop() {
-  scale.set_scale(calibration_factor); 
+  scale.set_scale(calibration_factor);
 
   Serial.print("Reading: ");
-  Serial.print(scale.get_units(), 3);
+  Serial.print(scale.get_units(3));
   Serial.print(" kg");
   Serial.print(" calibration_factor: ");
   Serial.print(calibration_factor);
   Serial.println();
-  //delay(1000);
+  // delay(100);
 
   if(Serial.available()) {
     char temp = Serial.read();
-    if(temp == '+' || temp == 'a')
+    if(temp == 'T' || temp == 't')
+    void esp_restart(void);
+
+    if(temp == '+' || temp == 'a' || temp == 'A')
       calibration_factor += 10;
-    else if(temp == '-' || temp == 'z')
+    if(temp == 'S' || temp == 's') 
+      calibration_factor += 1;
+    if(temp == '-' || temp == 'z' || temp == 'Z')
       calibration_factor -= 10;
-    if(temp == 'x')
-    scale.power_down();
+    if(temp == '+' || temp == 'X' || temp == 'x')
+      calibration_factor -= 1;
+
   }
 }
