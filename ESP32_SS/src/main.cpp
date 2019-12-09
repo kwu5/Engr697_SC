@@ -2,40 +2,60 @@
 #include <HX711.h>
 #include <WiFi.h>
 #include <FirebaseESP32.h>
+#include <time.h>
 
+/* Hotspot credentials */
 #define  SSID "KINAGO 8270"
 #define  PASS "1C2t8(77"
 
+/* Firebase authorization & init*/
 #define FIREBASE_HOST "smartscale697.firebaseio.com" 
 #define FIREBASE_AUTH "sjPs17K5ixPBqPWhyeYsEHQCgdXLWfkarxEzSSgO" 
-
-#define DOUT  25  // Scale data pin
-#define CLK   26  // Scale clock pin
-#define Threshold 40
-touch_pad_t touchPin;
-
-class HX711 scale;
-float calF = -12450; // Calibration Factor -7050, -12450.00,
-
-FirebaseData UserId;
+FirebaseData TIMEST;
 FirebaseData WEIGHT;
 
-void callback() {
-Serial.println("touchpad wake");
-Serial.println(touchRead(15));
-Serial.println(touchRead(4));
-scale.power_up();
+/* NTP server credentials */
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = -28800; // PST: -8h
+const int   daylightOffset_sec = 3600;
+char timestamp[50];
+
+/* Pins */
+#define DOUT  15 // Scale data pin
+#define CLK   4  // Scale clock pin
+#define CP    2  //control pin/reset
+#define Threshold 40
+touch_pad_t touchpad;
+
+/* HX711 call */
+class HX711 scale;
+float calF = -22185; // Calibration Factor
+
+/* wake from deep sleep */
+void callback(){
+  Serial.println("touch pin wake");
+  scale.power_up();
+}
+
+/* Get timestamp from server */
+void printLocalTime() {
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %l:%M:%S %p");
+  strftime(timestamp, 50, "%B %d, %Y %l:%M:%S %p", &timeinfo);
+  Firebase.pushString(TIMEST, "user/user1/scale/TIME", timestamp);
+  Serial.printf(timestamp);
 }
 
 void setup() {
   Serial.begin(115200);
-  delay(1000); //Take some time to open up the Serial Monitor
-
-  // Setup interrupt on (GPIO04 and GPIO15)
-  touchAttachInterrupt(15, callback, Threshold);  // sleepwake center capacitive button?
-  touchAttachInterrupt( 4, callback, Threshold);
-
-  // Configure Touchpad as wakeup source
+  // delay(1000); //Take some time to open up the Serial Monitor
+ 
+ // Configure wakeup source
+  touchAttachInterrupt(CP, callback, Threshold);
   esp_sleep_enable_touchpad_wakeup();
 
   // Scale startup
@@ -57,13 +77,19 @@ void setup() {
   Serial.println(); 
   Serial.print("Connected to IP: "); 
   Serial.println(WiFi.localIP()); 
-   
+
+  // init and get the time
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  printLocalTime();
+
+  // Firebase connect   
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
-  Firebase.getShallowData(UserId, "user");
   }
 
 void loop() {
+  delay(10000);
+  // pinMode(2, true);
   scale.set_scale(calF); 
   Serial.print("Reading: ");
   float weight = scale.get_units(10);
@@ -73,7 +99,7 @@ void loop() {
   Serial.print(calF);
   Serial.println();
   
-  Firebase.setFloat(WEIGHT, "user/user_1/weight", weight);
+  Firebase.pushFloat(WEIGHT, "user/user1/scale/WEIGHT", weight);
 
   // Sleep protocol
   delay(30000);
