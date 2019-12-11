@@ -23,7 +23,7 @@ char timestamp[50];
 /* Pins */
 #define DOUT  15 // Scale data pin
 #define CLK   4  // Scale clock pin
-#define CP    2  //control pin/reset
+#define CP    14  //control pin/reset
 #define Threshold 40
 touch_pad_t touchpad;
 
