@@ -8,32 +8,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
+
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
+
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseUser;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.database.Query;
-//import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -203,42 +190,6 @@ public class measurements extends AppCompatActivity {
 
 
 
-
-//        db.collection("UserData").get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-////                            Log.d(TAG, "List all userData below: ");
-//                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-////                                Log.d(TAG, TAG + "-- user read :" + documentSnapshot.getData());
-//                                if (documentSnapshot.get("USERUID").equals(USERUID)) {
-//                                    nUser = false;
-//                                    Log.d(TAG, "setUserInfo: user info found: " + documentSnapshot.getData());
-//                                    Log.d(TAG, "setUserInfo: id is  " + documentSnapshot.getId());
-//
-//
-//                                    isuserInfoSet = true;
-//
-//
-//                                    break;
-//                                }
-//                            }
-//
-//                            //create new user document
-//                            if (nUser) {
-//                                goInputUserInfo();
-//                            }
-////
-//                        } else {
-//                            Log.d(TAG, TAG + " Error getting documents: ", task.getException());
-//                        }
-////
-//                    }
-//                });
-////
-
-
     }
 
     /**
@@ -275,27 +226,8 @@ public class measurements extends AppCompatActivity {
         Log.d(TAG, "createNewUserDoc: value return");
         Log.d(TAG, "createNewUserDoc: Height:" + HEIGHT);
         Log.d(TAG, "createNewUserDoc: Age:" + AGE);
-
-
-//        Map<String, Object> nData = new HashMap<>();
-
-//        WEIGHT = new HashMap<>();
-//        BMI= new HashMap<>();
-
-
-//        //todo ask user for info
-//        nData.put("HEIGHT", HEIGHT);
-//        nData.put("USERUID", USERUID);
-//        nData.put("AGE", AGE);
-//        nData.put("WEIGHT", WEIGHT);
-//        nData.put("BMI", BMI);
-//
-//
-//        DocumentReference newUser = db.collection("UserData").document(USERUID);
-//        newUser.set(nData);
-
-
-        databaseReference.child("UserData").setValue(USERUID);
+        
+        databaseReference.child("UserData").child(USERUID);
         String key = databaseReference.child("UserData").child(USERUID).getKey();
         User user = new User(HEIGHT);
         Map<String, Object> userData = user.toMap();
@@ -340,65 +272,13 @@ public class measurements extends AppCompatActivity {
         });
     }
 
-//
-//        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    DocumentSnapshot documentSs = task.getResult();
-//                    if (documentSs.exists()) {
-//                        Log.d(TAG, "changeDocument: DocumentSnapshot Data: " + documentSs.getData());
-//
-//                        calculation(documentSs, USERUID);
-//
-//                    } else {
-//                        Log.d(TAG, "changeDocument: No such document");
-//                    }
-//                } else {
-//                    Log.w(TAG, "changeDocument: get failed with ", task.getException());
-//                }
-//
-//            }
-//        });
-//    }
-
 
     /**
      * 1.Perform calculation
      * 2.call upload method
-     *
-     * @param
+     * @param ESPdataSs
      * @param USERUID
      */
-//    public void calculation(final DocumentSnapshot documentSs, final String USERUID) {
-//
-//
-//        try {
-//
-//
-//            final DocumentReference documentRef = db.collection("UserData").document(USERUID);
-//            documentRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                @Override
-//                public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                    double height = documentSnapshot.getDouble("HEIGHT");
-//
-//                    weight_raw = documentSs.getDouble("WEIGHT").intValue();
-//                    Log.d(TAG, "calculation:Weight :" + weight_raw);
-//                    bmi_raw = weight_raw / (float) Math.pow(height, 2);
-//                    Log.d(TAG, "calculation: BMI is " + bmi_raw);
-//
-//                    uploadData(documentSs, USERUID);
-//                }
-//            });
-//
-//
-//        } catch (Exception e) {
-//            Log.d(TAG, "calculation: Error initializing weight and height: " + e.getMessage());
-//        }
-//
-//
-//    }
-
     public void calculation( final DataSnapshot ESPdataSs,final String USERUID) {
 
 
@@ -436,29 +316,6 @@ public class measurements extends AppCompatActivity {
 
 
 
-
-//
-//            final DocumentReference documentRef = db.collection("UserData").document(USERUID);
-//            documentRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                @Override
-//                public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                    double height = documentSnapshot.getDouble("HEIGHT");
-//
-//                    weight_raw = documentSs.getDouble("WEIGHT").intValue();
-//                    Log.d(TAG, "calculation:Weight :" + weight_raw);
-//                    bmi_raw = weight_raw / (float) Math.pow(height, 2);
-//                    Log.d(TAG, "calculation: BMI is " + bmi_raw);
-//
-//                    uploadData(documentSs, USERUID);
-//                }
-//            });
-//
-//
-//        } catch (Exception e) {
-//            Log.d(TAG, "calculation: Error initializing weight and height: " + e.getMessage());
-//        }
-
-
     }
 
 
@@ -479,7 +336,6 @@ public class measurements extends AppCompatActivity {
     /**
      * update data to fireBase
      */
-//    public void uploadData(DocumentSnapshot documentSs, String userId) {
     public void uploadData(DataSnapshot ESPDataSs, final DataSnapshot userDataSs) {
 
 //        Log.d(TAG, "uploadData: weight: " + weight_raw);
@@ -489,24 +345,12 @@ public class measurements extends AppCompatActivity {
 //        Log.d(TAG, "uploadData: Time is :"+ time);
 
 
-
-//        WEIGHT.put("WEIGHT", weightUpdate);
-
-
-//        userDataSs.getValue(User.class).updateBMI(time,bmi_raw);
-//        userDataSs.getValue(User.class).updateWeight(time,weight_raw);
-//        Log.d(TAG, "uploadData success ");
-
+        
         DatabaseReference userdb = databaseReference.child("UserData").child(USERUID);
-
-
+        
         WEIGHT = userDataSs.getValue(User.class).getWEIGHT();
         BMI = userDataSs.getValue(User.class).getBMI();
-
-
-
-
-
+        
         WEIGHT.put(time, weight_raw);
         BMI.put(time,bmi_raw);
 
@@ -519,176 +363,7 @@ public class measurements extends AppCompatActivity {
                 Log.d(TAG, "uploadData: all data upload.");
             }
         });
-
-
-
-
-
-
-//        String key = databaseReference.child("UserData").child(USERUID).getKey();
-//
-//        Map<String, Object> updates = new HashMap<>();
-//
-//        weightUpdate.put(time,weight_raw);
-//        BMIUpdate.put(time,bmi_raw);
-//
-//        updates.put("currentBMI",bmi_raw);
-//        updates.put("currentWeight",weight_raw);
-//        updates.put("BMI",BMIUpdate);
-//        updates.put("WEIGHT",weightUpdate);
-//
-//        Map<String, Object> childUpdates = new HashMap<>();
-//        childUpdates.put("/UserData/"+key,updates);
-//
-//        databaseReference.updateChildren(childUpdates).addOnSuccessListener(new OnSuccessListener<Void>() {
-//            @Override
-//            public void onSuccess(Void aVoid) {
-//                Log.d(TAG, "uploadData: uploadData success ");
-//            }
-//        });
-
-
-
-
-
-
-
-//        databaseReference.child("UserData").child(USERUID).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//
-//                Map<String, Object> childUpdates = new HashMap<>();
-//                childUpdates.put("/UserData/"+key,userData);
-//
-//
-//
-//
-//
-//                dataSnapshot.getValue(User.class).updateBMI(time,bmi_raw);
-//                dataSnapshot.getValue(User.class).updateWeight(time,weight_raw);
-//                dataSnapshot.getValue(User.class).setcurrentBMI(bmi_raw);
-//                dataSnapshot.getValue(User.class).setcurrentWeight(weight_raw);
-//                Log.d(TAG, "uploadData success ");
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                Log.w(TAG, "uploadData failed :"+ databaseError.toException());
-//            }
-//        });
-
-//                addOnSuccessListener(new OnSuccessListener<Void>() {
-//            @Override
-//            public void onSuccess(Void aVoid) {
-//                Log.d(TAG, "uploadData: weight upload success");
-//            }
-//        });
-//
-//
-//        BMIUpdate.put(time, bmi_raw);
-//        BMI.put("BMI", BMIUpdate);
-//        databaseReference.child("UserData").child(USERUID).updateChildren(BMIUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
-//            @Override
-//            public void onSuccess(Void aVoid) {
-//                Log.d(TAG, "uploadData: BMI upload success");
-//            }
-//        });
-//
-//
-//        databaseReference.child("UserData").child(USERUID).child("currentWeight").setValue(weight_raw).addOnSuccessListener(new OnSuccessListener<Void>() {
-//            @Override
-//            public void onSuccess(Void aVoid) {
-//                Log.d(TAG, "uploadData: raw_weight upload success");
-//            }
-//        });
-//
-//
-//        databaseReference.child("UserData").child(USERUID).child("currentBMI").setValue(bmi_raw).addOnSuccessListener(new OnSuccessListener<Void>() {
-//            @Override
-//            public void onSuccess(Void aVoid) {
-//                Log.d(TAG, "uploadData: raw_BMI upload success");
-//            }
-//        });
-//
-//
-
-
-
         displayData();
-
-
-
-//        Log.d(TAG, "uploadData: weight: " + weight_raw);
-//
-//
-//        String time = documentSs.getTimestamp("TIME").toDate().toString().substring(4, 10);
-////        Log.d(TAG, "uploadData: Time is :"+ time);
-//
-//
-//        weightUpdate.put(time, weight_raw);
-//        WEIGHT.put("WEIGHT", weightUpdate);
-//
-//        BMIUpdate.put(time, bmi_raw);
-//        BMI.put("BMI", BMIUpdate);
-//
-//
-//        db.collection("UserData").document(userId).
-//                set(WEIGHT, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
-//            @Override
-//            public void onComplete(@NonNull Task<Void> task) {
-//                if (task.isSuccessful()) {
-//                    Log.d(TAG, "uploadData: weight upload success");
-//                } else {
-//                    Log.d(TAG, "uploadData: weight uploadData failed");
-//                }
-//
-//            }
-//        });
-//
-//        db.collection("UserData").document(userId).
-//                set(BMI, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
-//            @Override
-//            public void onComplete(@NonNull Task<Void> task) {
-//                if (task.isSuccessful()) {
-//                    Log.d(TAG, "uploadData: BMI upload success");
-//                } else {
-//                    Log.d(TAG, "uploadData: BMI uploadData failed");
-//                }
-//
-//            }
-//        });
-//
-//
-//        Map<String, Object> updates = new HashMap<>();
-//        updates.put("currentWeight", weight_raw);
-//        updates.put("currentBMI", bmi_raw);
-////        updates.put("WEIGHT",weightUpdate);
-////        updates.put("BMI",BMIUpdate);
-//
-//
-//        DocumentReference doc = db.collection("UserData").document(userId);
-//
-//
-//        if (doc == null) {
-//            Log.d(TAG, "uploadData: cannot find targeted document");
-//        }
-//
-//        doc.update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
-//            @Override
-//            public void onComplete(@NonNull Task<Void> task) {
-//                if (task.isSuccessful()) {
-//                    Log.d(TAG, "uploadData: upload success");
-//                } else {
-//                    Log.d(TAG, "uploadData: uploadData failed");
-//                }
-//            }
-//        });
-//
-//
-//        updates.clear();
-//        displayData();
-//
 
     }
 

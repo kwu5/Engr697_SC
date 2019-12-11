@@ -19,7 +19,7 @@ public class inputUserInfo extends AppCompatActivity {
     EditText editText_age;
     Button button_enter;
 
-    //todo data fields
+    //data fields
     double height;
         int age;
 
@@ -47,7 +47,7 @@ public class inputUserInfo extends AppCompatActivity {
 
                 }else{
 
-                    //todo data fields
+                    //data fields
                     height = Double.parseDouble(editText_height.getText().toString());
                     age = Integer.parseInt(editText_age.getText().toString());
 
