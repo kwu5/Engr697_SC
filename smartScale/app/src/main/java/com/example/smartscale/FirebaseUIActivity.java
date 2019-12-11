@@ -110,8 +110,8 @@ public class FirebaseUIActivity extends AppCompatActivity {
             } else {
 
                 if(response == null){
-                    Log.d(TAG, "onActivityResult: response is null , todo ");
-                    //todo
+                    Log.w(TAG, "onActivityResult: response is null ");
+
 
                 }else{
 

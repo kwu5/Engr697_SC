@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
@@ -40,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    protected FirebaseFirestore db;
+   // protected FirebaseFirestore db;
+//    private FirebaseDatabase db;
 
 
 
@@ -54,11 +56,11 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate: MainActivity started");
 
 
-        db = FirebaseFirestore.getInstance();
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-        //        .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        db.setFirestoreSettings(settings);
+//        db = FirebaseDatabase.getInstance();
+//        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+//        //        .setTimestampsInSnapshotsEnabled(true)
+//                .build();
+//        db.setFirestoreSettings(settings);
 
 
 
